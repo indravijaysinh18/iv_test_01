@@ -1,41 +1,37 @@
-name: Deploy to EC2
+name: Deploy
 
 on:
   push:
     branches:
-      - dev  # Trigger this workflow on pushes to the `dev` branch
+      - dev
 
 jobs:
   build:
     name: Deploy to EC2
-    runs-on: ubuntu-latest  # Running the job on the latest Ubuntu runner
+    runs-on: ubuntu-latest
 
-    # Set environment variables here, so they are accessible across steps
     env:
       PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       SSH_HOST: ${{ secrets.SSH_HOST }}
       USER_NAME: ${{ secrets.USER_NAME }}
 
     steps:
-      # Step 1: Checkout the code from GitHub
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # To fetch the full history of the repository (important for deployments)
-
-      # Step 2: Set up SSH keys
-      - name: Set up SSH keys
+          fetch-depth: 0
+          
+      - name: SSH keys
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa  # Saving the private key to a file
           chmod 600 ~/.ssh/id_rsa  # Setting correct permissions for the private key
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts  # Adding SSH host key to known hosts
 
-      # Step 3: Pull the latest changes from the `dev` branch on EC2
       - name: Git pull from EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.USER_NAME }}@${{ secrets.SSH_HOST }} << 'EOF'
-            cd /home/ubuntu/CSVManagement || exit
-            git checkout dev || exit
-            git pull || exit
+            cd /home/ubuntu/CSVManagement &&
+            git checkout dev &&
+            git pull &&
           EOF
