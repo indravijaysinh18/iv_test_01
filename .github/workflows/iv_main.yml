@@ -13,6 +13,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+env:
+  PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+  SSH_HOST: ${{ secrets.SSH_HOST }}
+  USER_NAME: ${{ secrets.USER_NAME }}
+
+    steps:
       - name: Set up SSH keys      
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
@@ -21,7 +27,3 @@ jobs:
               git checkout dev &&
               git pull
           '
-env:
-  PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-  SSH_HOST: ${{ secrets.SSH_HOST }}
-  USER_NAME: ${{ secrets.USER_NAME }}
