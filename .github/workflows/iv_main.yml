@@ -33,4 +33,4 @@ jobs:
               cd /home/ubuntu/CSVManagement &&
               git checkout dev &&
               git pull
-        '
+          '
