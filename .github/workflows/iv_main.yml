@@ -1,32 +1,37 @@
 name: Deploy repo to ec2
+
 on:
   push:
     branches:
       - dev
+
 jobs:
   build:
     name: Deploy to EC2
     runs-on: ubuntu-latest
+
     env:
       PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       SSH_HOST: ${{ secrets.SSH_HOST }}
       USER_NAME: ${{ secrets.USER_NAME }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: SSH keys
-        run: >
+
+      - name: Set up SSH keys
+        run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
       - name: Git pull from EC2
-        run: >
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.USER_NAME
-          }}@${{ secrets.SSH_HOST }} << 'EOF'
-            cd /home/ubuntu/CSVManagement &&
-            git checkout dev &&
-            git pull &&
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.USER_NAME }}@${{ secrets.SSH_HOST }} << 'EOF'
+            cd /home/ubuntu/CSVManagement || exit
+            git checkout dev || exit
+            git pull || exit
           EOF
