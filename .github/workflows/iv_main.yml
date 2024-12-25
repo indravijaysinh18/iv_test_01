@@ -7,22 +7,23 @@ on:
 jobs:
   build:
     name: Deploy to EC2
-  
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: changes deploy
-      - uses: actions/checkout@v2 
-        
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Set up SSH keys
       - name: Set up SSH keys      
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${secrets.USER_NAME}@${secrets.HOSTNAME} '
+          ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.USER_NAME }}@${{ secrets.SSH_HOST }} '
               cd /home/ubuntu/CSVManagement &&
               git checkout dev &&
               git pull
-              '
+          '
         env:
-            PRIVATE_KEY: ${ secrets.SSH_PRIVATE_KEY }
-            HOSTNAME: ${secrets.SSH_HOST}
-            USER_NAME: ${secrets.USER_NAME}
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          USER_NAME: ${{ secrets.USER_NAME }}
