@@ -26,6 +26,7 @@ jobs:
                 git checkout dev &&
                 git pull
                 EOF
+                
         env:
             PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
             HOSTNAME: ${{secrets.SSH_HOST}}
