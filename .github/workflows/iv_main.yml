@@ -31,7 +31,7 @@ jobs:
       - name: Git pull from EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.USER_NAME }}@${{ secrets.SSH_HOST }} << 'EOF'
-            cd /home/ubuntu/CSVManagement || exit
-            git checkout dev || exit
-            git pull || exit
+            cd /home/ubuntu/CSVManagement &&
+            git checkout dev &&
+            git pull &&
           EOF
