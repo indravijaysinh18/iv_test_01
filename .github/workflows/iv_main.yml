@@ -28,7 +28,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Git pull from EC2
+      - name: Git pull from EC2 for push cahnges
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ env.USER_NAME }}@${{ env.SSH_HOST }} << 'EOF'
             cd /home/ubuntu/CSVManagement
