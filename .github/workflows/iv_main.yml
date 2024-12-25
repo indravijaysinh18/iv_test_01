@@ -1,4 +1,4 @@
-name: Deploy repo to ec2
+name: Deploy repo to EC2
 
 on:
   push:
@@ -30,8 +30,8 @@ jobs:
 
       - name: Git pull from EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.USER_NAME }}@${{ secrets.SSH_HOST }} << 'EOF'
-            cd /home/ubuntu/CSVManagement &&
-            git checkout dev &&
-            git pull &&
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ env.USER_NAME }}@${{ env.SSH_HOST }} << 'EOF'
+            cd /home/ubuntu/CSVManagement
+            git checkout dev
+            git pull
           EOF
