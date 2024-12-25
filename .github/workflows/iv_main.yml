@@ -2,28 +2,35 @@ name: Deploy
 
 on:
   push:
-    branches: [ dev ]
+    branches:
+      - dev
 
 jobs:
   build:
     name: on EC2
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-env:
-  PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-  SSH_HOST: ${{ secrets.SSH_HOST }}
-  USER_NAME: ${{ secrets.USER_NAME }}
+	env:
+        PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        USER_NAME: ${{ secrets.USER_NAME }}	
 
     steps:
-      - name: Set up SSH keys      
-        run: |
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up SSH keys
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Install Apache2 and Deploy index.html
+      run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.USER_NAME }}@${{ secrets.SSH_HOST }} '
               cd /home/ubuntu/CSVManagement &&
               git checkout dev &&
               git pull
-          '
+        '
