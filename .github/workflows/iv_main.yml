@@ -6,15 +6,13 @@ on:
 
 jobs:
   build:
-    name: Deploy to EC2
+    name: on EC2
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the code
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Set up SSH keys
       - name: Set up SSH keys      
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
