@@ -6,28 +6,32 @@ on:
 
 jobs:
   build:
-    name: ec2 deploy
+    name: EC2 Deploy
 
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-      
-      - name: SSH agent
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          
-      - name: SSH
-        run: |
-            echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-            ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} << 'EOF'
-                cd /home/ubuntu/CSVManagement &&
-                git checkout dev &&
-                git pull
-                EOF
-                
+        uses: actions/checkout@v3
         env:
-            PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-            HOSTNAME: ${{secrets.SSH_HOST}}
-            USER_NAME: ${{secrets.USER_NAME}}
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          HOSTNAME: ${{ secrets.SSH_HOST }}
+          USER_NAME: ${{ secrets.USER_NAME }}
+
+      - name: Set up SSH keys
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: SSH connect for Git Pull
+        run: |
+          ssh -o StrictHostKeyChecking=no ${USER_NAME}@${HOSTNAME} << 'EOF'
+            cd /home/ubuntu/CSVManagement || exit
+            git checkout dev || exit
+            git pull || exit
+          EOF
+        env:
+          USER_NAME: ${{ secrets.USER_NAME }}
+          HOSTNAME: ${{ secrets.SSH_HOST }}
